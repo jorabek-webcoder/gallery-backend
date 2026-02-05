@@ -4,7 +4,7 @@ const { mainRouter } = require("./routes");
 const { default: helmet } = require("helmet");
 const { ConnectDB } = require("./utils/config.database");
 const { errorMiddleware } = require("./middlewares/error.middleware");
-const { PORT } = require("./utils/secret");
+const { PORT, ALLOWED_ORIGINS } = require("./utils/secret");
 const { setupSwagger } = require("./swagger");
 const { startCleanupCron } = require("./utils/cron-jobs");
 const app = express();
@@ -20,23 +20,39 @@ app.use(helmet({
 app.use(
   cors({
     origin: function (origin, callback) {
-      const allowedOrigins = [
+      // Environment variable'dan originlarni olish
+      let allowedOrigins = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://localhost:8989",
         "https://news-api-backend-1t0e.onrender.com",
       ];
+
+      // Production uchun .env dan qo'shimcha originlar
+      if (ALLOWED_ORIGINS) {
+        const envOrigins = ALLOWED_ORIGINS.split(',').map(o => o.trim());
+        allowedOrigins = [...allowedOrigins, ...envOrigins];
+      }
       
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Swagger, Postman va backend o'zidan kelgan so'rovlar uchun
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(null, true);
+        console.log(`❌ CORS blocked origin: ${origin}`);
+        console.log(`✅ Allowed origins:`, allowedOrigins);
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: false
   }),
 );
 
