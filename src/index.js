@@ -24,7 +24,7 @@ app.use(
       let allowedOrigins = [
         "http://localhost:3000",
         "http://localhost:5173",
-        "http://localhost:8989",
+        "http://localhost:8685",
         "https://news-api-backend-1t0e.onrender.com",
       ];
 
