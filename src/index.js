@@ -20,6 +20,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:5173",
+      "https://localhost:8685",
       "https://gallery-backend-g1ha.onrender.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
