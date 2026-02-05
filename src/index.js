@@ -13,6 +13,20 @@ ConnectDB();
 // Cron job ni ishga tushirish
 startCleanupCron();
 
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://gallery-backend-g1ha.onrender.com",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,10 +35,6 @@ setupSwagger(app);
 app.get("/", (req, res) => {
   res.send("gallery server successfly");
 });
-
-app.use(cors());
-
-app.use(helmet());
 
 mainRouter.forEach((rItem) => {
   app.use(rItem.path, rItem.rout);
