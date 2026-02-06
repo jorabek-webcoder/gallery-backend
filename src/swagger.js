@@ -20,6 +20,10 @@ const options = {
         url: `http://localhost:${PORT || 3000}`,
         description: "Development server",
       },
+      {
+        url: "https://gallery-backend-g1ha.onrender.com",
+        description: "Production server",
+      }
     ],
     tags: [
       {
